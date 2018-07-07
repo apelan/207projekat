@@ -1,23 +1,23 @@
 CREATE TABLE `Role` (
-	`roleID` int NOT NULL,
+	`roleID` int NOT NULL AUTO_INCREMENT,
 	`roleName` varchar(50) NOT NULL,
 	PRIMARY KEY (`roleID`)
 );
 
 CREATE TABLE `Platforms` (
-	`platformID` int NOT NULL,
+	`platformID` int NOT NULL AUTO_INCREMENT,
 	`platformName` varchar(50) NOT NULL,
 	PRIMARY KEY (`platformID`)
 );
 
 CREATE TABLE `GameGenre` (
-	`genreID` int NOT NULL,
+	`genreID` int NOT NULL AUTO_INCREMENT,
 	`genreName` varchar(50) NOT NULL,
 	PRIMARY KEY (`genreID`)
 );
 
 CREATE TABLE `Developer` (
-	`developerID` int NOT NULL,
+	`developerID` int NOT NULL AUTO_INCREMENT,
 	`companyName` varchar(50) NOT NULL,
 	`website` varchar(50) NOT NULL,
 	`contactEmail` varchar(50) NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE `Developer` (
 );
 
 CREATE TABLE `User` (
-	`userID` int NOT NULL,
+	`userID` int NOT NULL AUTO_INCREMENT,
 	`roleID` int NOT NULL,
 	`firstName` varchar(50) NOT NULL,
 	`lastName` varchar(50) NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE `User` (
 );
 
 CREATE TABLE `Review` (
-	`reviewID` int NOT NULL,
+	`reviewID` int NOT NULL AUTO_INCREMENT,
 	`userID` int NOT NULL,
 	`stars` int NOT NULL,
 	`descrption` varchar(50) NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE `Review` (
 );
 
 CREATE TABLE `Game` (
-	`gameID` int NOT NULL,
+	`gameID` int NOT NULL AUTO_INCREMENT,
 	`genreID` int NOT NULL,
 	`platformID` int NOT NULL,
 	`developerID` int NOT NULL,
@@ -58,14 +58,14 @@ CREATE TABLE `Game` (
 );
 
 CREATE TABLE `Favourite` (
-	`favouriteID` int NOT NULL,
+	`favouriteID` int NOT NULL AUTO_INCREMENT,
 	`userID` int NOT NULL,
 	`gameID` int NOT NULL,
 	PRIMARY KEY (`favouriteID`)
 );
 
 CREATE TABLE `GameType` (
-	`typeID` int NOT NULL,
+	`typeID` int NOT NULL AUTO_INCREMENT,
 	`typeName` varchar(50) NOT NULL,
 	PRIMARY KEY (`typeID`)
 );
@@ -82,7 +82,8 @@ ALTER TABLE `Game` ADD CONSTRAINT `Game_fk2` FOREIGN KEY (`developerID`) REFEREN
 
 ALTER TABLE `Game` ADD CONSTRAINT `Game_fk3` FOREIGN KEY (`typeID`) REFERENCES `GameType`(`typeID`);
 
+ALTER TABLE `Game` ADD CONSTRAINT `Game_fk4` FOREIGN KEY (`reviewID`) REFERENCES `Review`(`reviewID`);
+
 ALTER TABLE `Favourite` ADD CONSTRAINT `Favourite_fk0` FOREIGN KEY (`userID`) REFERENCES `User`(`userID`);
 
 ALTER TABLE `Favourite` ADD CONSTRAINT `Favourite_fk1` FOREIGN KEY (`gameID`) REFERENCES `Game`(`gameID`);
-
