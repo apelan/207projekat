@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Game.findAll", query = "SELECT g FROM Game g")
     , @NamedQuery(name = "Game.findByGameID", query = "SELECT g FROM Game g WHERE g.gameID = :gameID")
+    , @NamedQuery(name = "Game.findByImage", query = "SELECT g FROM Game g WHERE g.image = :image")
     , @NamedQuery(name = "Game.findByGameName", query = "SELECT g FROM Game g WHERE g.gameName = :gameName")
     , @NamedQuery(name = "Game.findByDescription", query = "SELECT g FROM Game g WHERE g.description = :description")
     , @NamedQuery(name = "Game.findByPrice", query = "SELECT g FROM Game g WHERE g.price = :price")
@@ -42,6 +43,11 @@ public class Game implements Serializable {
     @Basic(optional = false)
     @Column(name = "gameID")
     private Integer gameID;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 500)
+    @Column(name = "image")
+    private String image;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
@@ -73,9 +79,8 @@ public class Game implements Serializable {
     @JoinColumn(name = "typeID", referencedColumnName = "typeID")
     @ManyToOne(optional = false)
     private Gametype typeID;
-    @JoinColumn(name = "reviewID", referencedColumnName = "reviewID")
-    @ManyToOne(optional = false)
-    private Review reviewID;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "gameID")
+    private List<Review> reviewList;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "gameID")
     private List<Favourite> favouriteList;
 
@@ -86,8 +91,9 @@ public class Game implements Serializable {
         this.gameID = gameID;
     }
 
-    public Game(Integer gameID, String gameName, String description, double price, Date releaseDate) {
+    public Game(Integer gameID, String image, String gameName, String description, double price, Date releaseDate) {
         this.gameID = gameID;
+        this.image = image;
         this.gameName = gameName;
         this.description = description;
         this.price = price;
@@ -100,6 +106,14 @@ public class Game implements Serializable {
 
     public void setGameID(Integer gameID) {
         this.gameID = gameID;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getGameName() {
@@ -166,12 +180,13 @@ public class Game implements Serializable {
         this.typeID = typeID;
     }
 
-    public Review getReviewID() {
-        return reviewID;
+    @XmlTransient
+    public List<Review> getReviewList() {
+        return reviewList;
     }
 
-    public void setReviewID(Review reviewID) {
-        this.reviewID = reviewID;
+    public void setReviewList(List<Review> reviewList) {
+        this.reviewList = reviewList;
     }
 
     @XmlTransient

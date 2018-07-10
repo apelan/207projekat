@@ -50,9 +50,11 @@ Contributor(s):
     <mapping class="entities.Game"/>
     <mapping class="entities.Gamegenre"/>
     <mapping class="entities.Gametype"/>
+    <mapping class="entities.Gender"/>
     <mapping class="entities.Platforms"/>
     <mapping class="entities.Review"/>
     <mapping class="entities.Role"/>
+    <mapping class="entities.State"/>
     <mapping class="entities.User"/>
   </session-factory>
 </hibernate-configuration>

@@ -1,6 +1,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -15,6 +16,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -29,6 +32,8 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "User.findByUserID", query = "SELECT u FROM User u WHERE u.userID = :userID")
     , @NamedQuery(name = "User.findByFirstName", query = "SELECT u FROM User u WHERE u.firstName = :firstName")
     , @NamedQuery(name = "User.findByLastName", query = "SELECT u FROM User u WHERE u.lastName = :lastName")
+    , @NamedQuery(name = "User.findByImage", query = "SELECT u FROM User u WHERE u.image = :image")
+    , @NamedQuery(name = "User.findByBirthDate", query = "SELECT u FROM User u WHERE u.birthDate = :birthDate")
     , @NamedQuery(name = "User.findByEmail", query = "SELECT u FROM User u WHERE u.email = :email")
     , @NamedQuery(name = "User.findByUsername", query = "SELECT u FROM User u WHERE u.username = :username")
     , @NamedQuery(name = "User.findByPassword", query = "SELECT u FROM User u WHERE u.password = :password")})
@@ -50,6 +55,16 @@ public class User implements Serializable {
     @Size(min = 1, max = 50)
     @Column(name = "lastName")
     private String lastName;
+    @Basic(optional = false)
+    @NotNull
+    @Size(min = 1, max = 500)
+    @Column(name = "image")
+    private String image;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "birthDate")
+    @Temporal(TemporalType.DATE)
+    private Date birthDate;
     // @Pattern(regexp="[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?", message="Invalid email")//if the field contains email address consider using this annotation to enforce field validation
     @Basic(optional = false)
     @NotNull
@@ -73,6 +88,12 @@ public class User implements Serializable {
     @JoinColumn(name = "roleID", referencedColumnName = "roleID")
     @ManyToOne(optional = false)
     private Role roleID;
+    @JoinColumn(name = "genderID", referencedColumnName = "genderID")
+    @ManyToOne(optional = false)
+    private Gender genderID;
+    @JoinColumn(name = "stateID", referencedColumnName = "stateID")
+    @ManyToOne(optional = false)
+    private State stateID;
 
     public User() {
     }
@@ -81,10 +102,12 @@ public class User implements Serializable {
         this.userID = userID;
     }
 
-    public User(Integer userID, String firstName, String lastName, String email, String username, String password) {
+    public User(Integer userID, String firstName, String lastName, String image, Date birthDate, String email, String username, String password) {
         this.userID = userID;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.image = image;
+        this.birthDate = birthDate;
         this.email = email;
         this.username = username;
         this.password = password;
@@ -112,6 +135,22 @@ public class User implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public Date getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
     }
 
     public String getEmail() {
@@ -162,6 +201,22 @@ public class User implements Serializable {
 
     public void setRoleID(Role roleID) {
         this.roleID = roleID;
+    }
+
+    public Gender getGenderID() {
+        return genderID;
+    }
+
+    public void setGenderID(Gender genderID) {
+        this.genderID = genderID;
+    }
+
+    public State getStateID() {
+        return stateID;
+    }
+
+    public void setStateID(State stateID) {
+        this.stateID = stateID;
     }
 
     @Override

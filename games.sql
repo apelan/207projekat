@@ -32,7 +32,9 @@ CREATE TABLE `developer` (
   `developerID` int(11) NOT NULL,
   `companyName` varchar(50) COLLATE utf8_slovenian_ci NOT NULL,
   `website` varchar(50) COLLATE utf8_slovenian_ci NOT NULL,
-  `contactEmail` varchar(50) COLLATE utf8_slovenian_ci NOT NULL
+  `contactEmail` varchar(50) COLLATE utf8_slovenian_ci NOT NULL,
+  `stateID` int(11) NOT NULL,
+  `numOfEmployees` int(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_slovenian_ci;
 
 -- --------------------------------------------------------
@@ -127,7 +129,7 @@ CREATE TABLE `platforms` (
 CREATE TABLE `review` (
   `reviewID` int(11) NOT NULL,
   `userID` int(11) NOT NULL,
-  `stars` int(11) NOT NULL,
+  `stars` int(5) NOT NULL,
   `descrption` varchar(50) COLLATE utf8_slovenian_ci NOT NULL,
   `gameID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_slovenian_ci;
@@ -159,7 +161,7 @@ CREATE TABLE `state` (
 --
 
 INSERT INTO `state` (`stateID`, `stateName`) VALUES
-(1, 'Afghanistan'),
+(1, 'Other'),
 (2, 'Afghanistan'),
 (3, 'Albania'),
 (4, 'Andorra'),
@@ -373,7 +375,8 @@ CREATE TABLE `user` (
   `genderID` int(11) NOT NULL,
   `email` varchar(50) COLLATE utf8_slovenian_ci NOT NULL,
   `username` varchar(50) COLLATE utf8_slovenian_ci NOT NULL,
-  `password` varchar(50) COLLATE utf8_slovenian_ci NOT NULL
+  `password` varchar(50) COLLATE utf8_slovenian_ci NOT NULL,
+  `stateID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_slovenian_ci;
 
 --
@@ -384,7 +387,8 @@ CREATE TABLE `user` (
 -- Indexes for table `developer`
 --
 ALTER TABLE `developer`
-  ADD PRIMARY KEY (`developerID`);
+  ADD PRIMARY KEY (`developerID`),
+  ADD KEY `Developer_fk0` (`stateID`);
 
 --
 -- Indexes for table `favourite`
@@ -454,7 +458,8 @@ ALTER TABLE `state`
 ALTER TABLE `user`
   ADD PRIMARY KEY (`userID`),
   ADD KEY `User_fk0` (`roleID`),
-  ADD KEY `User_fk1` (`genderID`);
+  ADD KEY `User_fk1` (`genderID`),
+  ADD KEY `User_fk2` (`stateID`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -531,6 +536,13 @@ ALTER TABLE `user`
 --
 
 --
+-- Constraints for table `developer`
+--
+ALTER TABLE `developer`
+  ADD CONSTRAINT `Developer_fk0` FOREIGN KEY (`stateID`) REFERENCES `state` (`stateID`);
+
+
+--
 -- Constraints for table `favourite`
 --
 ALTER TABLE `favourite`
@@ -558,7 +570,8 @@ ALTER TABLE `review`
 --
 ALTER TABLE `user`
   ADD CONSTRAINT `User_fk0` FOREIGN KEY (`roleID`) REFERENCES `role` (`roleID`),
-  ADD CONSTRAINT `User_fk1` FOREIGN KEY (`genderID`) REFERENCES `gender` (`genderID`);
+  ADD CONSTRAINT `User_fk1` FOREIGN KEY (`genderID`) REFERENCES `gender` (`genderID`),
+  ADD CONSTRAINT `User_fk2` FOREIGN KEY (`stateID`) REFERENCES `state` (`stateID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

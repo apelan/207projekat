@@ -1,9 +1,7 @@
 package entities;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,12 +11,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 
 @Entity
@@ -46,11 +42,12 @@ public class Review implements Serializable {
     @Size(min = 1, max = 50)
     @Column(name = "descrption")
     private String descrption;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "reviewID")
-    private List<Game> gameList;
     @JoinColumn(name = "userID", referencedColumnName = "userID")
     @ManyToOne(optional = false)
     private User userID;
+    @JoinColumn(name = "gameID", referencedColumnName = "gameID")
+    @ManyToOne(optional = false)
+    private Game gameID;
 
     public Review() {
     }
@@ -89,21 +86,20 @@ public class Review implements Serializable {
         this.descrption = descrption;
     }
 
-    @XmlTransient
-    public List<Game> getGameList() {
-        return gameList;
-    }
-
-    public void setGameList(List<Game> gameList) {
-        this.gameList = gameList;
-    }
-
     public User getUserID() {
         return userID;
     }
 
     public void setUserID(User userID) {
         this.userID = userID;
+    }
+
+    public Game getGameID() {
+        return gameID;
+    }
+
+    public void setGameID(Game gameID) {
+        this.gameID = gameID;
     }
 
     @Override

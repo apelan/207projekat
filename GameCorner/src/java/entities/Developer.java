@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -27,7 +29,8 @@ import javax.xml.bind.annotation.XmlTransient;
     , @NamedQuery(name = "Developer.findByDeveloperID", query = "SELECT d FROM Developer d WHERE d.developerID = :developerID")
     , @NamedQuery(name = "Developer.findByCompanyName", query = "SELECT d FROM Developer d WHERE d.companyName = :companyName")
     , @NamedQuery(name = "Developer.findByWebsite", query = "SELECT d FROM Developer d WHERE d.website = :website")
-    , @NamedQuery(name = "Developer.findByContactEmail", query = "SELECT d FROM Developer d WHERE d.contactEmail = :contactEmail")})
+    , @NamedQuery(name = "Developer.findByContactEmail", query = "SELECT d FROM Developer d WHERE d.contactEmail = :contactEmail")
+    , @NamedQuery(name = "Developer.findByNumOfEmployees", query = "SELECT d FROM Developer d WHERE d.numOfEmployees = :numOfEmployees")})
 public class Developer implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -51,8 +54,15 @@ public class Developer implements Serializable {
     @Size(min = 1, max = 50)
     @Column(name = "contactEmail")
     private String contactEmail;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "numOfEmployees")
+    private int numOfEmployees;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "developerID")
     private List<Game> gameList;
+    @JoinColumn(name = "stateID", referencedColumnName = "stateID")
+    @ManyToOne(optional = false)
+    private State stateID;
 
     public Developer() {
     }
@@ -61,11 +71,12 @@ public class Developer implements Serializable {
         this.developerID = developerID;
     }
 
-    public Developer(Integer developerID, String companyName, String website, String contactEmail) {
+    public Developer(Integer developerID, String companyName, String website, String contactEmail, int numOfEmployees) {
         this.developerID = developerID;
         this.companyName = companyName;
         this.website = website;
         this.contactEmail = contactEmail;
+        this.numOfEmployees = numOfEmployees;
     }
 
     public Integer getDeveloperID() {
@@ -100,6 +111,14 @@ public class Developer implements Serializable {
         this.contactEmail = contactEmail;
     }
 
+    public int getNumOfEmployees() {
+        return numOfEmployees;
+    }
+
+    public void setNumOfEmployees(int numOfEmployees) {
+        this.numOfEmployees = numOfEmployees;
+    }
+
     @XmlTransient
     public List<Game> getGameList() {
         return gameList;
@@ -107,6 +126,14 @@ public class Developer implements Serializable {
 
     public void setGameList(List<Game> gameList) {
         this.gameList = gameList;
+    }
+
+    public State getStateID() {
+        return stateID;
+    }
+
+    public void setStateID(State stateID) {
+        this.stateID = stateID;
     }
 
     @Override
@@ -131,7 +158,7 @@ public class Developer implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.Developer[ developerID=" + developerID + " ]";
+        return companyName;
     }
 
 }
