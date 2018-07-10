@@ -110,7 +110,7 @@
         </select>
         <br><br>
         <label>Birth date:</label>
-        <input type="date" name="birthDate"/>
+        <input type="date" name="birthDate" required/>
         <br><br>
         <label>Gender:</label>
         <select name="gender">

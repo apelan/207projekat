@@ -267,11 +267,12 @@ li {
   padding: 10px;
   overflow: auto;
 }
- 
+/*
 li:hover {
   background: #eee;
   cursor: pointer;
 }
+*/
 
 .price{
 	color: orange;
