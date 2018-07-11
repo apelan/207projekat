@@ -57,7 +57,8 @@ CREATE TABLE `favourite` (
 
 CREATE TABLE `game` (
   `gameID` int(11) NOT NULL,
-  `image` varchar(500) COLLATE utf8_slovenian_ci NOT NULL,
+  `image` varchar(500) NOT NULL,
+  `video` varchar(500),
   `genreID` int(11) NOT NULL,
   `platformID` int(11) NOT NULL,
   `developerID` int(11) NOT NULL,
@@ -146,6 +147,13 @@ CREATE TABLE `role` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_slovenian_ci;
 
 -- --------------------------------------------------------
+
+--
+-- Dumping data for table `role`
+--
+INSERT INTO `role` (`roleID`, `roleName`) VALUES
+(1, 'admin'),
+(2, 'defaultUser');
 
 --
 -- Table structure for table `state`

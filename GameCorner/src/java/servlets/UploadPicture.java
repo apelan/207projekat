@@ -19,14 +19,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-/**
- *
- * @author flash
- */
+//location="C:/Users/ladmin/Desktop/Proj/GameCorner/web/res/pics"
 @WebServlet
+
+//location=Treba da ide putanja do project foldera + \\res\\pics zato sto tu cuvamo slike i odatle se ucitavaju u prikazu
+//nadjite putanju gde vam je project folder
+//npr C:\\Users\\UlogovanUser\\Desktop\\GameCorner\\web\\res\\pics
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2,
         maxFileSize = 1024 * 1024 * 10,
-        maxRequestSize = 1024 * 1024 * 50)
+        maxRequestSize = 1024 * 1024 * 50,
+        location="C:\\Users\\UlogovanUser\\Desktop\\git\\207projekat\\GameCorner\\web\\res\\pics") //ko mene je ovako
 public class UploadPicture extends HttpServlet {
 
     /**
@@ -41,14 +43,12 @@ public class UploadPicture extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        
         try (PrintWriter out = response.getWriter()) {
             
             Part part = request.getPart("image");
             String fileName = extractFileName(part);
-            
-            //C:\\Users\\{USER}\\personal_domain\\generated\\jsp\\GameCorner
-            //To je putanja na kojoj se cuva slika
-            //Ovde umesto {USER} treba da ide ime kompa,tj user na kom je ulogovan
+
             String savePath = File.separator + fileName;
             File f = new File(savePath);
             part.write(savePath + File.separator);

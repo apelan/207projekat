@@ -101,7 +101,7 @@ public class Platforms implements Serializable {
 
     @Override
     public String toString() {
-        return platformName;
+        return "entities.Platforms[ platformID=" + platformID + " ]";
     }
 
 }

@@ -101,7 +101,7 @@ public class Gamegenre implements Serializable {
 
     @Override
     public String toString() {
-        return genreName;
+        return "entities.Gamegenre[ genreID=" + genreID + " ]";
     }
 
 }

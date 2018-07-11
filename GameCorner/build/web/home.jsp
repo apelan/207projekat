@@ -26,12 +26,12 @@
         <link rel="stylesheet" href="res/css/style.css">
     </head>
     <body>
-
         <%
-            GenericDAO<Favourite> gdFavourite = new GenericDAOImpl<Favourite>();
-            List<Favourite> favourites = gdFavourite.readAll(Favourite.class); //TREBA SAMO PO ODREJENOM USERU DA CITA-DAO SLOJ ZA FAVOURITES TRENUTNO CITA SVE FAVOURITE IGRE
-            //Ako nema korisnika vracamo ga na index
+            //Ako nema korisnika vracamo ga na index(login)
             User user = (User) session.getAttribute("user");
+            GenericDAO<Favourite> gdFavourite = new GenericDAOImpl<Favourite>();
+            
+            List<Favourite> favourites = user.getFavouriteList();
             if (user == null) {
         %>
         <jsp:forward page="index.jsp"></jsp:forward>
@@ -49,6 +49,10 @@
                     %>
                         <a href="#options" class="w3-bar-item w3-button">Options</a>
                     <% }%>
+                    
+                    <% if(user.getRoleID().getRoleID() == 2){%>
+                    <a href="#favourites" class="w3-bar-item w3-button">Favourites</a>
+                    <%}%>
                     <a href="#games" class="w3-bar-item w3-button">Games</a>
                     <a href="#profile" class="w3-bar-item w3-button">Profile</a>
                 </div>
@@ -93,9 +97,18 @@
                 <div>
                     <ul style="width: 100%;">  
                     <%    for (Game game : games) {
-                %> 
+                    %> 
                         <li style="width: 50%; float: left;">
+                            <% 
+                                if(game.getImage().equals("nopic")){
+                            %>
                             <img src="res/pics/game.png" alt="Game picture" width="200" height="200">
+                            <% 
+                                }else{
+                                String imagePathGame = "res\\pics" + game.getImage();
+                            %>
+                            <img width="200" height="200" src="<%= imagePathGame %>" alt="<%= imagePathGame %>">
+                            <%  }%>
                             <h4><%= game.getGameName()%></h4>
                             <p>Description: <%= game.getDescription()%></p>
                             <p >Release date: <%= game.getReleaseDate()%></p>
@@ -109,17 +122,81 @@
                             <% } else {%>
                             <h4 style="color:orange;">Price: <%= game.getPrice()%>$</h4>
                             <% } %>
-                            <!-- Ako vec nije favorizavana bi trebalo samo da moze da se doda-->
+                            <%
+                                
+                            %>
+                            <!-- Ako vec nije favorizavana trebalo bi samo da moze da se doda-->
                             <form action="home.jsp?action=addFavourite" method="POST">
                                 <input type="hidden" name="gameIDtoFavourite" value="<%= game.getGameID() %>"/>
                                 <input class="w3-button" type="submit" value="Add to favourites">
                             </form>
+                            <% }} %>   
+                            <!-- SHOW GAMEPLAY/TRAILER-->
+                            <form action="home.jsp?action=showGameplay" method="POST">
+                                <input type="hidden" name="gameIDshowGameplay" value="<%= game.getGameID() %>"/>
+                                <input class="w3-button" type="submit" value="Show gameplay">
+                            </form>    
                         </li>
                     <%
                 }%> 
+                
                     </ul>
                 </div>
-            </div>
+            </div><br>
+            
+        <!-- Favourites Section -->
+        <div class="w3-container w3-padding-32" id="favourites">
+            <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Favourites</h3>
+        </div>
+        <% 
+            //Prikazuje samo ako lista nije prazna
+            if(!favourites.isEmpty()){
+        %>
+            <div>
+                    <ul style="width: 100%;">  
+                    <%    for (Favourite favGame : favourites) {
+                    %> 
+                        <li style="width: 50%; float: left;">
+                            <% 
+                                if(favGame.getGameID().getImage().equals("nopic")){
+                            %>
+                            <img src="res/pics/game.png" alt="Game picture" width="200" height="200">
+                            <% 
+                                }else{
+                                String imagePathGame = "res\\pics" + favGame.getGameID().getImage();
+                            %>
+                            <img width="200" height="200" src="<%= imagePathGame %>" alt="<%= imagePathGame %>">
+                            <%  }%>
+                            <h4><%= favGame.getGameID().getGameName()%></h4>
+                            <p>Description: <%= favGame.getGameID().getDescription()%></p>
+                            <p >Release date: <%= favGame.getGameID().getReleaseDate()%></p>
+                            <p>Developer: <a href="<%= favGame.getGameID().getDeveloperID().getWebsite() %>"> <%= favGame.getGameID().getDeveloperID().getCompanyName()%></a></p>
+                            <br>
+                            <h4>Tags: <%= favGame.getGameID().getTypeID().getTypeName()%>, <%= favGame.getGameID().getGenreID().getGenreName()%></h4>
+                            <%
+                                if (favGame.getGameID().getPrice() == 0) {
+                            %>
+                            <h3 style="color:orange;">FREE</h3>
+                            <% } else {%>
+                            <h4 style="color:orange;">Price: <%= favGame.getGameID().getPrice()%>$</h4>
+                            <% } %>
+                              
+                            <!-- SHOW GAMEPLAY/TRAILER-->
+                            <form action="home.jsp?action=showGameplay" method="POST">
+                                <input type="hidden" name="gameIDshowGameplay" value="<%= favGame.getGameID().getGameID() %>"/>
+                                <input class="w3-button" type="submit" value="Show gameplay">
+                            </form>    
+                        </li>
+                    <%
+                }%> 
+                
+                    </ul>
+                </div>
+        
+        <%}else{%>
+        <h1>No favourites.</h1>
+        <% }%>
+        
             <%
                }
 
@@ -129,6 +206,11 @@
                 favourite.setUserID(user);
                 gdFavourite.persist(favourite);
                 response.sendRedirect("home.jsp");         
+            }else if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("showGameplay")) {
+                Integer id = Integer.parseInt(request.getParameter("gameIDshowGameplay"));
+                Game gameplayGame = gameDao.readById(id);
+                request.getSession().setAttribute("gameplayGame", gameplayGame);
+                response.sendRedirect("gamepage.jsp");
             }
 //********************* ADMIN ********************* 
             } else if (user.getRoleID().getRoleID() == 1) {
@@ -163,7 +245,8 @@
                     gameToAdd.setGenreID(new Gamegenre(Integer.valueOf(request.getParameter("genre"))));
                     gameToAdd.setTypeID(new Gametype(Integer.valueOf(request.getParameter("type"))));
                     gameToAdd.setPlatformID(new Platforms(Integer.valueOf(request.getParameter("platform"))));
-                    gameToAdd.setImage("asdasd");
+                    gameToAdd.setImage("nopic");
+                    gameToAdd.setVideo(request.getParameter("gameVideo"));
 
                     String date = request.getParameter("releaseDate");
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -172,7 +255,7 @@
                     gameDao.persist(gameToAdd);
                     response.sendRedirect("home.jsp");
 
-                } else if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("deletegame")) {
+                } else if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("deleteGame")) {
                     Integer id = Integer.parseInt(request.getParameter("gameIDtoDelete"));
                     Game gameToDelete = gameDao.readById(id);
                     gameDao.delete(gameToDelete);
@@ -232,6 +315,7 @@
                 <form id="addGameForm" action="home.jsp?action=addgame" method="POST">
                     <input type="text" name="gameName" placeholder="Game name" required/> <br><br>
                     <textarea maxlength="200" rows="4" cols="50" form="addGameForm" name="gameDescription" required>Game description...</textarea> <br><br>
+                    <input type="text" name="gameVideo" placeholder="Video URL(embed)" required/> <br><br>
                     <input type="text" name="price" placeholder="Price" required/> <br><br>
                     <label>Release date: </label>
                     <input type="date" name="releaseDate" required/><br><br>
@@ -329,7 +413,6 @@
                             <label>State: </label>
                             <select name="state">
                                 <% 
-
                                     for(State s: states){
                                 %>
                                 <option value="<%= s.getStateID() %>"><%= s.getStateName() %></option>
@@ -357,7 +440,23 @@
                     <ul style="width: 100%;">  
                     <% for (Game game : games) {%>
                         <li style="width: 50%; float: left;">
-                            <img src="res/pics/game.png" alt="Game picture" width="200" height="200">
+                            <% 
+                                if(game.getImage().equals("nopic")){
+                            %>
+                            <img width="200" height="200" src="res/pics/game.png" alt="Game">
+                            <form action="UploadPictureGame" method="POST" enctype="multipart/form-data">
+                                <p>Select image to upload:</p>
+                                <input type="hidden" name="gameIDPicUpload" value="<%= game.getGameID() %>">
+                                <input type="file" name="image">
+                                <input class="w3-button" type="submit" value="Upload">
+                                <br><br>
+                            </form>
+                            <%
+                                }else{
+                                String imagePathGame = "res\\pics" + game.getImage();
+                            %>
+                            <img width="200" height="200" src="<%= imagePathGame %>" alt="<%= imagePathGame %>">
+                            <% }%>
                             <h4><%= game.getGameName()%></h4>
                             <p>Description: <%= game.getDescription()%></p>
                             <p >Release date: <%= game.getReleaseDate()%></p>
@@ -371,7 +470,7 @@
                             <% } else {%>
                             <h4 style="color:orange;">Price: <%= game.getPrice()%>$</h4>
                             <% } %>
-                            <form action="home.jsp?action=deleteGame">
+                            <form method="POST" action="home.jsp?action=deleteGame">
                                 <input type="hidden" name="gameIDtoDelete" value="<%= game.getGameID() %>"/>
                                 <input class="w3-button" type="submit" value="Delete game">
                             </form>
@@ -383,24 +482,6 @@
             <%
             }%>
         <%}%>
-        
-        <% 
-            //Prikazuje samo ako lista nije prazna
-            if(!favourites.isEmpty()){
-        %>
-            <table>
-                <th>Favourite games</th>
-                <% 
-                    for(Favourite fav: favourites){
-                %>
-                <tr>
-                    <td><%= fav.getGameID().getGameName() %> </td>
-                </tr>
-                <% }%>
-            </table>
-        
-        <%}%>
-
             <!-- Profile Section -->
             <div class="w3-container w3-padding-32" id="profile">
                 <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Profile</h3>
@@ -419,10 +500,10 @@
                             <br><br>
                         </form>
                         <%
-                            }else{ //Ovde umesto {USER} treba da ide ime kompa,tj user na kom je ulogovan
-                            String imagePath = "C:\\Users\\{USER}\\personal_domain\\generated\\jsp\\GameCorner" + user.getImage();
+                            }else{
+                            String imagePath = "res\\pics" + user.getImage();
                         %>
-                        <img src="<%= imagePath %>" alt="<%= imagePath %>" style="width:100%">
+                        <img width="300" height="300" src="<%= imagePath %>" alt="<%= imagePath %>" style="width:100%">
                         <%  }%>
                         
                         <h3>${user.firstName} ${user.lastName}</h3>

@@ -4,13 +4,27 @@
         <servlet-name>UploadPicture</servlet-name>
         <servlet-class>servlets.UploadPicture</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>UploadPictureGame</servlet-name>
+        <servlet-class>servlets.UploadPictureGame</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>UploadPicture</servlet-name>
         <url-pattern>/UploadPicture</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UploadPictureGame</servlet-name>
+        <url-pattern>/UploadPictureGame</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
             30
         </session-timeout>
     </session-config>
+    <context-param>
+        <param-name>file-upload</param-name>
+        <param-value>
+        C:\Users\ladmin\Desktop\Proj\GameCorner\web\res\pics
+     </param-value>
+    </context-param>
 </web-app>

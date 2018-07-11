@@ -13,8 +13,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="res/css/style.css">
 </head>
-<body>
 
+<body>
 <!-- Navbar (sit on top) -->
 <div class="w3-top">
   <div class="w3-bar w3-white w3-wide w3-padding w3-card">
@@ -42,8 +42,8 @@
 <div class="w3-container w3-padding-32" id="profile">
 	<h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Profile</h3>
 </div>
+  
 <div class="container">
-    
         <%
             if (request.getMethod().equalsIgnoreCase("post")) {
                 String username = request.getParameter("username");
@@ -52,9 +52,7 @@
                 try {
                     User u = dao.checkUser(username, password);
                     session.setAttribute("user", u);
-        %>
-        <jsp:forward page="home.jsp"></jsp:forward>
-        <%
+                    response.sendRedirect("home.jsp");
                 } catch (Exception ex) {
                     out.println(ex.getMessage());
                 }
@@ -74,6 +72,8 @@
 <!-- End page content -->
 </div>
 
+        
+        
 <!-- Footer -->
 <footer class="w3-center w3-black w3-padding-16">
   <p>Copyright © NoName 2018</p>

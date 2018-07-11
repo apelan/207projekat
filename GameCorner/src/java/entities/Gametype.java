@@ -101,7 +101,7 @@ public class Gametype implements Serializable {
 
     @Override
     public String toString() {
-        return typeName;
+        return "entities.Gametype[ typeID=" + typeID + " ]";
     }
 
 }

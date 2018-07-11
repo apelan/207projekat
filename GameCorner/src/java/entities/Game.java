@@ -31,6 +31,7 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Game.findAll", query = "SELECT g FROM Game g")
     , @NamedQuery(name = "Game.findByGameID", query = "SELECT g FROM Game g WHERE g.gameID = :gameID")
     , @NamedQuery(name = "Game.findByImage", query = "SELECT g FROM Game g WHERE g.image = :image")
+    , @NamedQuery(name = "Game.findByVideo", query = "SELECT g FROM Game g WHERE g.video = :video")
     , @NamedQuery(name = "Game.findByGameName", query = "SELECT g FROM Game g WHERE g.gameName = :gameName")
     , @NamedQuery(name = "Game.findByDescription", query = "SELECT g FROM Game g WHERE g.description = :description")
     , @NamedQuery(name = "Game.findByPrice", query = "SELECT g FROM Game g WHERE g.price = :price")
@@ -48,6 +49,9 @@ public class Game implements Serializable {
     @Size(min = 1, max = 500)
     @Column(name = "image")
     private String image;
+    @Size(max = 500)
+    @Column(name = "video")
+    private String video;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
@@ -114,6 +118,14 @@ public class Game implements Serializable {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
     }
 
     public String getGameName() {

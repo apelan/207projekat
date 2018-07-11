@@ -54,11 +54,9 @@ public class GenericDAOImpl<T> implements GenericDAO<T>{
            session = util.HibernateUtil.getSessionFactory().openSession();
         Transaction t = null;
         try{
-            
             t = session.beginTransaction();
             session.delete(obj);
             t.commit();
-   
         }catch(HibernateException e) {
             t.rollback();
             e.printStackTrace();

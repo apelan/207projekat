@@ -158,7 +158,7 @@ public class Developer implements Serializable {
 
     @Override
     public String toString() {
-        return companyName;
+        return "entities.Developer[ developerID=" + developerID + " ]";
     }
 
 }
