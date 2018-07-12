@@ -82,8 +82,9 @@
                     GameDAO gameDao = new GameDAOImpl();
                     List<Game> games = gameDao.readAll(Game.class);
 //********************* DEFAULT USER ********************* 
-                    if (user.getRoleID().getRoleID() == 2) { %>
-        <!-- Games Section -->
+            if (user.getRoleID().getRoleID() == 2) { %>
+                
+                <!-- Games Section -->
         <div class="w3-container w3-padding-32" id="games">
             <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Games</h3>
         </div>
@@ -129,8 +130,7 @@
                             <form action="home.jsp?action=addFavourite" method="POST">
                                 <input type="hidden" name="gameIDtoFavourite" value="<%= game.getGameID() %>"/>
                                 <input class="w3-button" type="submit" value="Add to favourites">
-                            </form>
-                            <% }} %>   
+                            </form>  
                             <!-- SHOW GAMEPLAY/TRAILER-->
                             <form action="home.jsp?action=showGameplay" method="POST">
                                 <input type="hidden" name="gameIDshowGameplay" value="<%= game.getGameID() %>"/>
@@ -138,7 +138,7 @@
                             </form>    
                         </li>
                     <%
-                }%> 
+                }}%> 
                 
                     </ul>
                 </div>
@@ -193,25 +193,24 @@
                     </ul>
                 </div>
         
-        <%}else{%>
-        <h1>No favourites.</h1>
-        <% }%>
-        
-            <%
-               }
+                <%}else{%>
+                <h1>No favourites.</h1>
+                <%}%>
 
-            if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("addFavourite")) {
-                Favourite favourite = new Favourite();
-                favourite.setGameID(new Game(Integer.parseInt(request.getParameter("gameIDtoFavourite"))));
-                favourite.setUserID(user);
-                gdFavourite.persist(favourite);
-                response.sendRedirect("home.jsp");         
-            }else if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("showGameplay")) {
-                Integer id = Integer.parseInt(request.getParameter("gameIDshowGameplay"));
-                Game gameplayGame = gameDao.readById(id);
-                request.getSession().setAttribute("gameplayGame", gameplayGame);
-                response.sendRedirect("gamepage.jsp");
-            }
+                <%
+
+                if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("addFavourite")) {
+                    Favourite favourite = new Favourite();
+                    favourite.setGameID(new Game(Integer.parseInt(request.getParameter("gameIDtoFavourite"))));
+                    favourite.setUserID(user);
+                    gdFavourite.persist(favourite);
+                    response.sendRedirect("home.jsp");         
+                }else if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("showGameplay")) {
+                    Integer id = Integer.parseInt(request.getParameter("gameIDshowGameplay"));
+                    Game gameplayGame = gameDao.readById(id);
+                    request.getSession().setAttribute("gameplayGame", gameplayGame);
+                    response.sendRedirect("gamepage.jsp");
+                }
 //********************* ADMIN ********************* 
             } else if (user.getRoleID().getRoleID() == 1) {
                 //logika za dodavanje igre u bazu

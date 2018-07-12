@@ -28,7 +28,7 @@ import javax.servlet.http.Part;
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2,
         maxFileSize = 1024 * 1024 * 10,
         maxRequestSize = 1024 * 1024 * 50,
-        location="C:\\Users\\UlogovanUser\\Desktop\\git\\207projekat\\GameCorner\\web\\res\\pics") //ko mene je ovako
+        location="C:\\Users\\flash\\Desktop\\git\\207projekat\\GameCorner\\web\\res\\pics") //ko mene je ovako
 public class UploadPicture extends HttpServlet {
 
     /**
