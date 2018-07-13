@@ -89,7 +89,7 @@ public class Favourite implements Serializable {
 
     @Override
     public String toString() {
-        return "entities.Favourite[ favouriteID=" + favouriteID + " ]";
+        return gameID.getGameName() + " is favourized by " + userID.getUsername();
     }
     
 }

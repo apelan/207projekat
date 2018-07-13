@@ -52,11 +52,12 @@ public class UploadPicture extends HttpServlet {
             String savePath = File.separator + fileName;
             File f = new File(savePath);
             part.write(savePath + File.separator);
-            response.sendRedirect("home.jsp");
             UserDAO dao = new UserDAOImpl();
             User u = (User)request.getSession().getAttribute("user");
             u.setImage(savePath);
             dao.update(u);
+             response.sendRedirect("home.jsp");
+            response.flushBuffer();
         }
     }
     

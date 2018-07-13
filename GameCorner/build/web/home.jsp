@@ -1,3 +1,5 @@
+<%@page import="dao.FavouriteDAOImpl"%>
+<%@page import="dao.FavouriteDAO"%>
 <%@page import="entities.Favourite"%>
 <%@page import="java.io.File"%>
 <%@page import="entities.State"%>
@@ -29,14 +31,14 @@
         <%
             //Ako nema korisnika vracamo ga na index(login)
             User user = (User) session.getAttribute("user");
-            GenericDAO<Favourite> gdFavourite = new GenericDAOImpl<Favourite>();
-            
-            List<Favourite> favourites = user.getFavouriteList();
+            FavouriteDAO favouriteDAO = new FavouriteDAOImpl();
+            List<Game> favourites = favouriteDAO.getFavGames(user);
+
             if (user == null) {
-        %>
-        <jsp:forward page="index.jsp"></jsp:forward>
-        <%}
-        %>
+            %>
+            <jsp:forward page="index.jsp"></jsp:forward>
+            <%}
+            %>
 
         <!-- Navbar (sit on top) -->
         <div class="w3-top">
@@ -44,14 +46,14 @@
                 <a href="#home" class="w3-bar-item w3-button"><b>Game</b> Corner</a>
                 <!-- Float links to the right. Hide them on small screens -->
                 <div class="w3-right w3-hide-small">
-                    <% 
-                        if(user.getRoleID().getRoleID() == 1){
+                    <%
+                        if (user.getRoleID().getRoleID() == 1) {
                     %>
-                        <a href="#options" class="w3-bar-item w3-button">Options</a>
+                    <a href="#options" class="w3-bar-item w3-button">Options</a>
                     <% }%>
-                    
-                    <% if(user.getRoleID().getRoleID() == 2){%>
-                    <a href="#favourites" class="w3-bar-item w3-button">Favourites</a>
+
+                    <% if (user.getRoleID().getRoleID() == 2) {%>
+                    <a href="favourites.jsp" class="w3-bar-item w3-button">Favourites</a>
                     <%}%>
                     <a href="#games" class="w3-bar-item w3-button">Games</a>
                     <a href="#profile" class="w3-bar-item w3-button">Profile</a>
@@ -82,38 +84,39 @@
                     GameDAO gameDao = new GameDAOImpl();
                     List<Game> games = gameDao.readAll(Game.class);
 //********************* DEFAULT USER ********************* 
-            if (user.getRoleID().getRoleID() == 2) { %>
-                
+                    if (user.getRoleID().getRoleID() == 2) { %>
+
                 <!-- Games Section -->
-        <div class="w3-container w3-padding-32" id="games">
-            <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Games</h3>
-        </div>
-                <% 
+                <div class="w3-container w3-padding-32" id="games">
+                    <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Games</h3>
+                </div>
+                <%
                     //If there is no games
-                    if(games.isEmpty()){
-                        %>
-                        <h1>Sorry. There is no games yet.</h1>
-                    <%}else{%>
-                    
+                    if (games.isEmpty()) {
+                %>
+                <h1>Sorry. There is no games yet.</h1>
+                <%} else {%>
+
                 <div>
                     <ul style="width: 100%;">  
-                    <%    for (Game game : games) {
-                    %> 
+                        <%    for (Game game : games) {
+                        %> 
                         <li style="width: 50%; float: left;">
-                            <% 
-                                if(game.getImage().equals("nopic")){
+                            <%
+                                if (game.getImage().equals("nopic")) {
                             %>
                             <img src="res/pics/game.png" alt="Game picture" width="200" height="200">
-                            <% 
-                                }else{
+                            <%
+                            } else {
                                 String imagePathGame = "res\\pics" + game.getImage();
                             %>
-                            <img width="200" height="200" src="<%= imagePathGame %>" alt="<%= imagePathGame %>">
+                            <img width="200" height="200" src="<%= imagePathGame%>" alt="<%= imagePathGame%>">
                             <%  }%>
                             <h4><%= game.getGameName()%></h4>
                             <p>Description: <%= game.getDescription()%></p>
                             <p >Release date: <%= game.getReleaseDate()%></p>
-                            <p>Developer: <a href="<%= game.getDeveloperID().getWebsite() %>"> <%= game.getDeveloperID().getCompanyName()%></a></p>
+                            <p>Developer: <a href="<%= game.getDeveloperID().getWebsite()%>"> <%= game.getDeveloperID().getCompanyName()%></a></p>
+                            <p>Platform: <%= game.getPlatformID().getPlatformName() %></p>
                             <br>
                             <h4>Tags: <%= game.getTypeID().getTypeName()%>, <%= game.getGenreID().getGenreName()%></h4>
                             <%
@@ -124,93 +127,68 @@
                             <h4 style="color:orange;">Price: <%= game.getPrice()%>$</h4>
                             <% } %>
                             <%
-                                
+
                             %>
-                            <!-- Ako vec nije favorizavana trebalo bi samo da moze da se doda-->
-                            <form action="home.jsp?action=addFavourite" method="POST">
-                                <input type="hidden" name="gameIDtoFavourite" value="<%= game.getGameID() %>"/>
-                                <input class="w3-button" type="submit" value="Add to favourites">
-                            </form>  
-                            <!-- SHOW GAMEPLAY/TRAILER-->
-                            <form action="home.jsp?action=showGameplay" method="POST">
-                                <input type="hidden" name="gameIDshowGameplay" value="<%= game.getGameID() %>"/>
-                                <input class="w3-button" type="submit" value="Show gameplay">
-                            </form>    
+                            <table>
+                                <tr>
+                                    <td>
+                                        <%
+                                            //Ako vec nije favorizavana ne prikazujemo dugme "Add to favourites"
+                                            if(!favourites.contains(game)){
+                                        %>
+                                        <form action="home.jsp?action=addFavourite" method="POST">
+                                            <input type="hidden" name="gameIDtoFavourite" value="<%= game.getGameID()%>"/>
+                                            <input class="w3-button" type="submit" value="Add to favourites">
+                                        </form> 
+                                        <% //A ako je favorizovana prikazujemo dugme "Remove from favourites"
+                                           }else{
+                                        %>
+                                        <form action="home.jsp?action=removeFavourite" method="POST">
+                                            <input type="hidden" name="gameIDtoUnfavourite" value="<%= game.getGameID()%>"/>
+                                            <input class="w3-button" type="submit" value="Remove from favourites">
+                                        </form> 
+                                        <% }%>
+                                    </td>
+                                    <td>
+                                        <!-- SHOW GAMEPLAY/TRAILER-->
+                                        <form action="home.jsp?action=showGameplay" method="POST">
+                                            <input type="hidden" name="gameIDshowGameplay" value="<%= game.getGameID()%>"/>
+                                            <input class="w3-button" type="submit" value="Show gameplay">
+                                        </form> 
+                                    </td>
+                                </tr>        
+                            </table>     
                         </li>
-                    <%
-                }}%> 
-                
+                        <%
+                                }
+                            }%> 
+
                     </ul>
                 </div>
             </div><br>
-            
-        <!-- Favourites Section -->
-        <div class="w3-container w3-padding-32" id="favourites">
-            <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Favourites</h3>
-        </div>
-        <% 
-            //Prikazuje samo ako lista nije prazna
-            if(!favourites.isEmpty()){
-        %>
-            <div>
-                    <ul style="width: 100%;">  
-                    <%    for (Favourite favGame : favourites) {
-                    %> 
-                        <li style="width: 50%; float: left;">
-                            <% 
-                                if(favGame.getGameID().getImage().equals("nopic")){
-                            %>
-                            <img src="res/pics/game.png" alt="Game picture" width="200" height="200">
-                            <% 
-                                }else{
-                                String imagePathGame = "res\\pics" + favGame.getGameID().getImage();
-                            %>
-                            <img width="200" height="200" src="<%= imagePathGame %>" alt="<%= imagePathGame %>">
-                            <%  }%>
-                            <h4><%= favGame.getGameID().getGameName()%></h4>
-                            <p>Description: <%= favGame.getGameID().getDescription()%></p>
-                            <p >Release date: <%= favGame.getGameID().getReleaseDate()%></p>
-                            <p>Developer: <a href="<%= favGame.getGameID().getDeveloperID().getWebsite() %>"> <%= favGame.getGameID().getDeveloperID().getCompanyName()%></a></p>
-                            <br>
-                            <h4>Tags: <%= favGame.getGameID().getTypeID().getTypeName()%>, <%= favGame.getGameID().getGenreID().getGenreName()%></h4>
-                            <%
-                                if (favGame.getGameID().getPrice() == 0) {
-                            %>
-                            <h3 style="color:orange;">FREE</h3>
-                            <% } else {%>
-                            <h4 style="color:orange;">Price: <%= favGame.getGameID().getPrice()%>$</h4>
-                            <% } %>
-                              
-                            <!-- SHOW GAMEPLAY/TRAILER-->
-                            <form action="home.jsp?action=showGameplay" method="POST">
-                                <input type="hidden" name="gameIDshowGameplay" value="<%= favGame.getGameID().getGameID() %>"/>
-                                <input class="w3-button" type="submit" value="Show gameplay">
-                            </form>    
-                        </li>
-                    <%
-                }%> 
-                
-                    </ul>
-                </div>
-        
-                <%}else{%>
-                <h1>No favourites.</h1>
-                <%}%>
 
-                <%
+            <%
 
                 if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("addFavourite")) {
                     Favourite favourite = new Favourite();
                     favourite.setGameID(new Game(Integer.parseInt(request.getParameter("gameIDtoFavourite"))));
                     favourite.setUserID(user);
-                    gdFavourite.persist(favourite);
-                    response.sendRedirect("home.jsp");         
-                }else if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("showGameplay")) {
+                    favouriteDAO.persist(favourite);
+                    response.sendRedirect("home.jsp");
+                    response.flushBuffer();
+                } else if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("removeFavourite")) {
+                    Integer gameIDtoUnfavourite = Integer.parseInt(request.getParameter("gameIDtoUnfavourite"));
+                    Game gUnfav = gameDao.readById(gameIDtoUnfavourite);
+                    Favourite favToDelete = favouriteDAO.readFavouriteByGameNUser(gUnfav, user);
+                    favouriteDAO.delete(favToDelete);
+                    response.sendRedirect("home.jsp");
+                } else if (request.getMethod().equalsIgnoreCase("post") && request.getParameter("action") != null && request.getParameter("action").equals("showGameplay")) {
                     Integer id = Integer.parseInt(request.getParameter("gameIDshowGameplay"));
                     Game gameplayGame = gameDao.readById(id);
                     request.getSession().setAttribute("gameplayGame", gameplayGame);
                     response.sendRedirect("gamepage.jsp");
                 }
+                
 //********************* ADMIN ********************* 
             } else if (user.getRoleID().getRoleID() == 1) {
                 //logika za dodavanje igre u bazu
@@ -297,85 +275,85 @@
                     response.sendRedirect("home.jsp");
 
                 }
-%>
-     <!-- Options Section -->
-        <div class="w3-container w3-padding-32" id="options">
-            <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Options</h3>
-        </div>
-        <%
-            //Ako developer,genre,type i platforma ne postoje onda ne dajemo mogucnost da se unosi igra.
-            if(!developers.isEmpty() && !genres.isEmpty() && !types.isEmpty() && !platforms.isEmpty()){
-        %>
-
-        <!-- ADD GAMES  UI-->
-        <div class="mdivwrapper">
-            <div class="mdivcenter">
-                <h1> Add Game </h1>
-                <form id="addGameForm" action="home.jsp?action=addgame" method="POST">
-                    <input type="text" name="gameName" placeholder="Game name" required/> <br><br>
-                    <textarea maxlength="200" rows="4" cols="50" form="addGameForm" name="gameDescription" required>Game description...</textarea> <br><br>
-                    <input type="text" name="gameVideo" placeholder="Video URL(embed)" required/> <br><br>
-                    <input type="text" name="price" placeholder="Price" required/> <br><br>
-                    <label>Release date: </label>
-                    <input type="date" name="releaseDate" required/><br><br>
-
-                    <!-- SELECT DEVELOPER -->
-                    <label>Developer: </label>
-                    <select name="developer">
-                        <%                        
-                            for (Developer dev : developers) {
-                        %>
-                        <option value="<%= dev.getDeveloperID()%>"><%= dev.getCompanyName()%></option>
-                        <% } %>
-                    </select> <br><br>
-
-                    <!-- SELECT GENRE -->
-                    <label>Genre: </label>
-                    <select name="genre">
-                        <%
-                            for (Gamegenre gen : genres) {
-                        %>
-                        <option value="<%= gen.getGenreID()%>"><%= gen.getGenreName()%></option>
-                        <% } %>
-                    </select> <br><br>
-
-                    <!-- SELECT TYPE -->
-                    <label>Type: </label> 
-                    <select name="type">
-                        <%
-                            for (Gametype typ : types) {
-                        %>
-                        <option value="<%= typ.getTypeID()%>"><%= typ.getTypeName()%></option>
-                        <% } %>
-                    </select> <br><br>
-
-                    <!-- SELECT PLATFORM -->
-                    <label>Platform: </label> 
-                    <select name="platform">
-                        <%
-                            for (Platforms plat : platforms) {
-                        %>
-                        <option value="<%= plat.getPlatformID()%>"><%= plat.getPlatformName()%></option>
-                        <% } %>
-                    </select> <br><br>
-                    <input class="w3-button" type="submit" value="Add game"/>
-                </form>
+            %>
+            <!-- Options Section -->
+            <div class="w3-container w3-padding-32" id="options">
+                <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Options</h3>
             </div>
-        </div>
-        <br>
-            <% }else{ %>
+            <%
+                //Ako developer,genre,type i platforma ne postoje onda ne dajemo mogucnost da se unosi igra.
+                if (!developers.isEmpty() && !genres.isEmpty() && !types.isEmpty() && !platforms.isEmpty()) {
+            %>
+
+            <!-- ADD GAMES  UI-->
+            <div class="mdivwrapper">
+                <div class="mdivcenter">
+                    <h1> Add Game </h1>
+                    <form id="addGameForm" action="home.jsp?action=addgame" method="POST">
+                        <input type="text" name="gameName" placeholder="Game name" required/> <br><br>
+                        <textarea maxlength="200" rows="4" cols="50" form="addGameForm" name="gameDescription" required>Game description...</textarea> <br><br>
+                        <input type="text" name="gameVideo" placeholder="Video URL(embed)" required/> <br><br>
+                        <input type="text" name="price" placeholder="Price" required/> <br><br>
+                        <label>Release date: </label>
+                        <input type="date" name="releaseDate" required/><br><br>
+
+                        <!-- SELECT DEVELOPER -->
+                        <label>Developer: </label>
+                        <select name="developer">
+                            <%
+                                for (Developer dev : developers) {
+                            %>
+                            <option value="<%= dev.getDeveloperID()%>"><%= dev.getCompanyName()%></option>
+                            <% } %>
+                        </select> <br><br>
+
+                        <!-- SELECT GENRE -->
+                        <label>Genre: </label>
+                        <select name="genre">
+                            <%
+                                for (Gamegenre gen : genres) {
+                            %>
+                            <option value="<%= gen.getGenreID()%>"><%= gen.getGenreName()%></option>
+                            <% } %>
+                        </select> <br><br>
+
+                        <!-- SELECT TYPE -->
+                        <label>Type: </label> 
+                        <select name="type">
+                            <%
+                                for (Gametype typ : types) {
+                            %>
+                            <option value="<%= typ.getTypeID()%>"><%= typ.getTypeName()%></option>
+                            <% } %>
+                        </select> <br><br>
+
+                        <!-- SELECT PLATFORM -->
+                        <label>Platform: </label> 
+                        <select name="platform">
+                            <%
+                                for (Platforms plat : platforms) {
+                            %>
+                            <option value="<%= plat.getPlatformID()%>"><%= plat.getPlatformName()%></option>
+                            <% } %>
+                        </select> <br><br>
+                        <input class="w3-button" type="submit" value="Add game"/>
+                    </form>
+                </div>
+            </div>
+            <br>
+            <% } else {%>
             <h3>Currently you can't add games.</h3>
             <p>You have first to add platforms,types etc.</p>
             <p>
-                Genres: <%= gdGenre.readAll(Gamegenre.class) %><br>
-                Platforms: <%= gdPlatforms.readAll(Platforms.class) %><br>
-                Types: <%= gdType.readAll(Gametype.class) %><br>
-                Developers: <%= gdDeveloper.readAll(Developer.class) %><br>
+                Genres: <%= gdGenre.readAll(Gamegenre.class)%><br>
+                Platforms: <%= gdPlatforms.readAll(Platforms.class)%><br>
+                Types: <%= gdType.readAll(Gametype.class)%><br>
+                Developers: <%= gdDeveloper.readAll(Developer.class)%><br>
             </p>
             <%}%>
             <hr>
-            
-        
+
+
             <table style="width:100%; border: 1px solid #dddddd; text-align: center; padding: 8px;">
                 <tr>
                     <th><h1>Add genre</h1></th>
@@ -396,7 +374,7 @@
                             <button class="w3-button" type="submit" id="login-button">Add platform</button>
                         </form>
                     </td>
-                    
+
                     <td>
                         <form class="form" method="POST" action="home.jsp?action=addGameType">
                             <input maxlength="50" type="text" name="gametype" placeholder="Enter game type " required><br><br>           
@@ -411,10 +389,10 @@
                             <input maxlength="50" type="number" name="numOfEmployees" placeholder="Number of employees" required><br><br>
                             <label>State: </label>
                             <select name="state">
-                                <% 
-                                    for(State s: states){
+                                <%
+                                    for (State s : states) {
                                 %>
-                                <option value="<%= s.getStateID() %>"><%= s.getStateName() %></option>
+                                <option value="<%= s.getStateID()%>"><%= s.getStateName()%></option>
                                 <%}%>
                             </select>
                             <br><br>
@@ -422,65 +400,65 @@
                         </form>
                     </td>
                 </tr>
-                
+
             </table>  
             <!-- Games Section -->
             <div class="w3-container w3-padding-32" id="games">
                 <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Games</h3>
             </div>
-            <% 
-                //If there is no games
-                if(games.isEmpty()){
-                    %>
-                    <h1>No games.</h1>
-                <%}else{
-            %>
-                <div>
-                    <ul style="width: 100%;">  
-                    <% for (Game game : games) {%>
-                        <li style="width: 50%; float: left;">
-                            <% 
-                                if(game.getImage().equals("nopic")){
-                            %>
-                            <img width="200" height="200" src="res/pics/game.png" alt="Game">
-                            <form action="UploadPictureGame" method="POST" enctype="multipart/form-data">
-                                <p>Select image to upload:</p>
-                                <input type="hidden" name="gameIDPicUpload" value="<%= game.getGameID() %>">
-                                <input type="file" name="image">
-                                <input class="w3-button" type="submit" value="Upload">
-                                <br><br>
-                            </form>
-                            <%
-                                }else{
-                                String imagePathGame = "res\\pics" + game.getImage();
-                            %>
-                            <img width="200" height="200" src="<%= imagePathGame %>" alt="<%= imagePathGame %>">
-                            <% }%>
-                            <h4><%= game.getGameName()%></h4>
-                            <p>Description: <%= game.getDescription()%></p>
-                            <p >Release date: <%= game.getReleaseDate()%></p>
-                            <p>Developer: <a href="<%= game.getDeveloperID().getWebsite() %>"> <%= game.getDeveloperID().getCompanyName()%></a></p>
-                            <br>
-                            <h4>Tags: <%= game.getTypeID().getTypeName()%>, <%= game.getGenreID().getGenreName()%></h4>
-                            <%
-                                if (game.getPrice() == 0) {
-                            %>
-                            <h3 style="color:orange;">FREE</h3>
-                            <% } else {%>
-                            <h4 style="color:orange;">Price: <%= game.getPrice()%>$</h4>
-                            <% } %>
-                            <form method="POST" action="home.jsp?action=deleteGame">
-                                <input type="hidden" name="gameIDtoDelete" value="<%= game.getGameID() %>"/>
-                                <input class="w3-button" type="submit" value="Delete game">
-                            </form>
-                        </li>
-                <%
-                }%>
-                    </ul>
-                </div>
             <%
-            }%>
-        <%}%>
+                //If there is no games
+                if (games.isEmpty()) {
+            %>
+            <h1>No games.</h1>
+            <%} else {
+            %>
+            <div>
+                <ul style="width: 100%;">  
+                    <% for (Game game : games) {%>
+                    <li style="width: 50%; float: left;">
+                        <%
+                            if (game.getImage().equals("nopic")) {
+                        %>
+                        <img width="200" height="200" src="res/pics/game.png" alt="Game">
+                        <form action="UploadPictureGame" method="POST" enctype="multipart/form-data">
+                            <p>Select image to upload:</p>
+                            <input type="hidden" name="gameIDPicUpload" value="<%= game.getGameID()%>">
+                            <input type="file" name="image">
+                            <input class="w3-button" type="submit" value="Upload">
+                            <br><br>
+                        </form>
+                        <%
+                        } else {
+                            String imagePathGame = "res\\pics" + game.getImage();
+                        %>
+                        <img width="200" height="200" src="<%= imagePathGame%>" alt="<%= imagePathGame%>">
+                        <% }%>
+                        <h4><%= game.getGameName()%></h4>
+                        <p>Description: <%= game.getDescription()%></p>
+                        <p >Release date: <%= game.getReleaseDate()%></p>
+                        <p>Developer: <a href="<%= game.getDeveloperID().getWebsite()%>"> <%= game.getDeveloperID().getCompanyName()%></a></p>
+                        <p>Platform: <%= game.getPlatformID().getPlatformName() %></p>
+                        <br>
+                        <h4>Tags: <%= game.getTypeID().getTypeName()%>, <%= game.getGenreID().getGenreName()%></h4>
+                        <%
+                            if (game.getPrice() == 0) {
+                        %>
+                        <h3 style="color:orange;">FREE</h3>
+                        <% } else {%>
+                        <h4 style="color:orange;">Price: <%= game.getPrice()%>$</h4>
+                        <% }%>
+                        <form method="POST" action="home.jsp?action=deleteGame">
+                            <input type="hidden" name="gameIDtoDelete" value="<%= game.getGameID()%>"/>
+                            <input class="w3-button" type="submit" value="Delete game">
+                        </form>
+                    </li>
+                    <%}%>
+                </ul>
+            </div>
+            <%
+                }%>
+            <%}%>
             <!-- Profile Section -->
             <div class="w3-container w3-padding-32" id="profile">
                 <h3 class="w3-border-bottom w3-border-light-grey w3-padding-16">Profile</h3>
@@ -489,8 +467,9 @@
                 <div class="profilediv">
                     <div class="profilediv">
                         <%
-                            if(user.getImage().equals("nopic")){
+                            if (user.getImage().equals("nopic")) {
                         %>
+
                         <img src="res/pics/user.png" alt="User" style="width:100%">
                         <form action="UploadPicture" method="POST" enctype="multipart/form-data">
                             <p>Select image to upload:</p>
@@ -499,25 +478,28 @@
                             <br><br>
                         </form>
                         <%
-                            }else{
+                        } else {
                             String imagePath = "res\\pics" + user.getImage();
                         %>
-                        <img width="300" height="300" src="<%= imagePath %>" alt="<%= imagePath %>" style="width:100%">
+                        <img width="300" height="300" src="<%= imagePath%>" alt="<%= imagePath%>" style="width:100%">
                         <%  }%>
-                        
+                        <%  //AKo nije admin ne prikazujemo mu favorite. ADmin ne moze da doda favoritne igre,mora da radi svoj posao ;(
+                            if(user.getRoleID().getRoleID() == 2){ %>
+                        <a href="favourites.jsp"><button class="w3-button">Favourite games</button></a> 
+                        <% }%>
                         <h3>${user.firstName} ${user.lastName}</h3>
                         <p class="w3-opacity">${user.username}</p>
                         <p>Email: ${user.email}</p>
-                        <p>State: <%= user.getStateID().getStateName() %></p>
-                        <% 
+                        <p>State: <%= user.getStateID().getStateName()%></p>
+                        <%
                             String userGenderText = "";
-                            if(user.getGenderID().getGenderID() == 1){
+                            if (user.getGenderID().getGenderID() == 1) {
                                 userGenderText = "Male";
-                            }else{
+                            } else {
                                 userGenderText = "Female";
                             }
                         %>
-                        <p>Gender: <%= userGenderText %></p>
+                        <p>Gender: <%= userGenderText%></p>
                         <p>Birth date: ${user.birthDate}</p>
                         <form action="home.jsp?action=logout" method="POST">
                             <p><button type="submit" name="logoutBtn" class="w3-button w3-light-grey w3-block">Logout</button></p>

@@ -3,6 +3,7 @@ package dao;
 import entities.User;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 
 public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO {
@@ -32,8 +33,6 @@ public class UserDAOImpl extends GenericDAOImpl<User> implements UserDAO {
         } finally {
             session.close();
         }
-
-        return  null;
-        // TODO: throw instead of null user exceptions
+        return null;
     }
 }

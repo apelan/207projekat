@@ -42,6 +42,7 @@ public class UploadPictureGame extends HttpServlet {
             Game g = dao.readById(gameID);
             g.setImage(savePath);
             dao.update(g);
+            response.flushBuffer();
         }
     }
     
