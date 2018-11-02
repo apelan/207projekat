@@ -1,4 +1,4 @@
-# 207projekat
+# 207project
 
 School project.
 Site about games.
