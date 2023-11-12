@@ -1,7 +1,6 @@
-Game Corner is website where you can explore video games. Inspired by popular platform Steam but lightweight version without ability to purchase games
-
 Educational project. Its purpose was to demo creating basic web app with database connectivity and persistency.
 
+Game Corner is website where you can explore video games. Inspired by popular platform Steam but lightweight version without ability to purchase games
 
 There is possibility to register/login with really simple "security" on mind.
 
